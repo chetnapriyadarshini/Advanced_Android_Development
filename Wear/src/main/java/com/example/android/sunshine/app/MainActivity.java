@@ -28,7 +28,7 @@ import java.io.InputStream;
 public class MainActivity extends Activity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private TextView mTextView;
+    private static TextView mTextView;
 
 
     @Override
@@ -44,11 +44,13 @@ public class MainActivity extends Activity {
         });
     }
 
-    public class WeatherDataReceiver extends BroadcastReceiver{
+    public static class WeatherDataReceiver extends BroadcastReceiver{
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            WearDataObject wearDataObject = (WearDataObject) intent.getSerializableExtra(getString(R.string.weather_object_key));
+
+            WearDataObject wearDataObject = (WearDataObject) intent.getSerializableExtra
+                    (context.getString(R.string.weather_object_key));
             mTextView.setText("MaxTemp: "+wearDataObject.getMaxTemp()+"\n"+
                     "MinTemp: "+wearDataObject.getMinTemp()+"\n"+
                     "Humidity: "+wearDataObject.getHumidity()+"\n"+

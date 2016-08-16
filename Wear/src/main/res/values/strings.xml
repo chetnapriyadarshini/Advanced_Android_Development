@@ -6,4 +6,5 @@
     <string name="hello_square">Hello Square World!</string>
     <string name="weather_object_key" translatable="false">weather_object_key</string>
     <string name="broadcast_weather" translatable="false">broadcast_weather</string>
+    <string name="bitmap_resource_key" translatable ="false">bitmap_resource_key</string>
 </resources>
