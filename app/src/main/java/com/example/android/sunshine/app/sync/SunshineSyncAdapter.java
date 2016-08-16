@@ -36,6 +36,15 @@ import com.example.android.sunshine.app.R;
 import com.example.android.sunshine.app.Utility;
 import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.muzei.WeatherMuzeiSource;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,7 +61,8 @@ import java.net.URL;
 import java.util.Vector;
 import java.util.concurrent.ExecutionException;
 
-public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
+public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
     public final String LOG_TAG = SunshineSyncAdapter.class.getSimpleName();
     public static final String ACTION_DATA_UPDATED =
             "com.example.android.sunshine.app.ACTION_DATA_UPDATED";
@@ -63,6 +73,14 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
     private static final int WEATHER_NOTIFICATION_ID = 3004;
 
+
+    private static final String TODAY_WEATHER_PATH = "/today_weather";
+    private static final String WEATHER_ASSET_TODAY_KEY = "weather_asset_today";
+    private static final String WETHER_DESC_TODAY_KEY = "weather_desc_today";
+    private static final String MAX_TEMP_TODAY_KEY = "max_temp_today";
+    private static final String MIN_TEMP_TODAY_KEY = "min_temp_today";
+    private static final String HUMIDITY_TODAY_KEY = "humidity_today";
+    private static final String PRESSURE_TODAY_KEY = "pressure_today";
 
     private static final String[] NOTIFY_WEATHER_PROJECTION = new String[] {
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
@@ -76,6 +94,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int INDEX_MAX_TEMP = 1;
     private static final int INDEX_MIN_TEMP = 2;
     private static final int INDEX_SHORT_DESC = 3;
+    private GoogleApiClient mGoogleApiClient;
+    private PutDataRequest putDataRequest;
 
     @Retention(RetentionPolicy.SOURCE)
     @IntDef({LOCATION_STATUS_OK, LOCATION_STATUS_SERVER_DOWN, LOCATION_STATUS_SERVER_INVALID,  LOCATION_STATUS_UNKNOWN, LOCATION_STATUS_INVALID})
@@ -94,7 +114,14 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
         Log.d(LOG_TAG, "Starting sync");
-
+        /*
+        Initialize google api client
+         */
+        mGoogleApiClient = new GoogleApiClient.Builder(getContext()).addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+        mGoogleApiClient.connect();
         // We no longer need just the location String, but also potentially the latitude and
         // longitude, in case we are syncing based on a new Place Picker API result.
         Context context = getContext();
@@ -337,7 +364,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
                 high = temperatureObject.getDouble(OWM_MAX);
                 low = temperatureObject.getDouble(OWM_MIN);
-
+                updateWearData(new WearDataObject(weatherId, description, (float)high,(float)low, (float)pressure,
+                        (float)humidity));
                 ContentValues weatherValues = new ContentValues();
 
                 weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, locationId);
@@ -378,6 +406,45 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
             e.printStackTrace();
             setLocationStatus(getContext(), LOCATION_STATUS_SERVER_INVALID);
         }
+    }
+
+    private void updateWearData(WearDataObject wearDataObject) {
+        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(TODAY_WEATHER_PATH);
+        DataMap dataMap = putDataMapRequest.getDataMap();
+        int weatherArtResourceId = Utility.getArtResourceForWeatherCondition(wearDataObject.getWeatherId());
+        Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), weatherArtResourceId);
+        Asset asset = Utility.createAssetFromBitmap(bitmap);
+        dataMap.putAsset(WEATHER_ASSET_TODAY_KEY, asset);
+        dataMap.putString(WETHER_DESC_TODAY_KEY, wearDataObject.getDescription());
+        dataMap.putString(MAX_TEMP_TODAY_KEY, Utility.formatTemperature(getContext(),wearDataObject.getMaxTemp()));
+        dataMap.putString(MIN_TEMP_TODAY_KEY, Utility.formatTemperature(getContext(),wearDataObject.getMinTemp()));
+        dataMap.putFloat(HUMIDITY_TODAY_KEY, wearDataObject.getHumidity());
+        dataMap.putFloat(PRESSURE_TODAY_KEY, wearDataObject.getPressure());
+        dataMap.putLong("Time", System.currentTimeMillis());
+        putDataRequest = putDataMapRequest.asPutDataRequest();
+        if(mGoogleApiClient.isConnected()) {
+            Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest);
+            putDataRequest = null;
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        if(putDataRequest != null) {
+            Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest);
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
     }
 
     private void updateWidgets() {

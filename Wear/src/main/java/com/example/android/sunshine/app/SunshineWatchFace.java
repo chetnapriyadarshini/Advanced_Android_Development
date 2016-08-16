@@ -74,8 +74,6 @@ public class SunshineWatchFace extends CanvasWatchFaceService implements DataApi
      */
     private static final int MSG_UPDATE_TIME = 0;
     private static final String TAG = SunshineWatchFace.class.getSimpleName();
-    private static final String TODAY_WEATHER_PATH = "today_weather";
-    private static final String WEATHER_KEY = "weather_asset";
 
 
     @Override
@@ -89,57 +87,8 @@ public class SunshineWatchFace extends CanvasWatchFaceService implements DataApi
     public void onDataChanged(DataEventBuffer dataEvents) {
         Log.d(TAG, "onDataChanged(): " + dataEvents);
 
-        for (DataEvent event : dataEvents) {
-            if (event.getType() == DataEvent.TYPE_CHANGED) {
-                String path = event.getDataItem().getUri().getPath();
-                if (TODAY_WEATHER_PATH.equals(path)) {
-                    DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
-                    Asset photoAsset = dataMapItem.getDataMap()
-                            .getAsset(WEATHER_KEY);
-
-                    // Loads image on background thread.
-                //    new LoadBitmapAsyncTask().execute(photoAsset);
-
-                }
-            }
-        }
     }
 
-
- /*   private class LoadBitmapAsyncTask extends AsyncTask<Asset, Void, Bitmap> {
-
-        @Override
-        protected Bitmap doInBackground(Asset... params) {
-
-            if (params.length > 0) {
-
-                Asset asset = params[0];
-
-                InputStream assetInputStream = Wearable.DataApi.getFdForAsset(
-                        mGoogleApiClient, asset).await().getInputStream();
-
-                if (assetInputStream == null) {
-                    Log.w(TAG, "Requested an unknown Asset.");
-                    return null;
-                }
-                return BitmapFactory.decodeStream(assetInputStream);
-
-            } else {
-                Log.e(TAG, "Asset must be non-null");
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-
-            if (bitmap != null) {
-                Log.d(TAG, "Setting background image on second page..");
-                //TODO use bitmap in watch face
-            }
-        }
-    }
-*/
     private static class EngineHandler extends Handler {
         private final WeakReference<SunshineWatchFace.Engine> mWeakReference;
 
