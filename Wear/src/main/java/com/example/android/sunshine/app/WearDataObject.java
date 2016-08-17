@@ -11,17 +11,22 @@ public class WearDataObject implements Serializable
 {
 
     private String maxTemp, minTemp;
-    private float pressure;
-    private float humidity;
+    private String pressure;
+    private String humidity;
     private String description;
 
-    public WearDataObject(String description, String maxTemp, String minTemp, float pressure, float humidity){
+    public WearDataObject(String description, String maxTemp, String minTemp, String pressure, String humidity){
 
         this.description = description;
         this.maxTemp = maxTemp;
         this.minTemp = minTemp;
         this.pressure = pressure;
         this.humidity = humidity;
+    }
+
+    public WearDataObject(String maxTemp, String minTemp) {
+        this.maxTemp = maxTemp;
+        this.minTemp = minTemp;
     }
 
 
@@ -37,11 +42,11 @@ public class WearDataObject implements Serializable
         return minTemp;
     }
 
-    public float getPressure() {
+    public String getPressure() {
         return pressure;
     }
 
-    public float getHumidity() {
+    public String getHumidity() {
         return humidity;
     }
 

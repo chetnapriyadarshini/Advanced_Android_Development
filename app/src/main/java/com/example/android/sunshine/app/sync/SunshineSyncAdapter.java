@@ -74,14 +74,6 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
     private static final int WEATHER_NOTIFICATION_ID = 3004;
 
 
-    private static final String TODAY_WEATHER_PATH = "/today_weather";
-    private static final String WEATHER_ASSET_TODAY_KEY = "weather_asset_today";
-    private static final String WETHER_DESC_TODAY_KEY = "weather_desc_today";
-    private static final String MAX_TEMP_TODAY_KEY = "max_temp_today";
-    private static final String MIN_TEMP_TODAY_KEY = "min_temp_today";
-    private static final String HUMIDITY_TODAY_KEY = "humidity_today";
-    private static final String PRESSURE_TODAY_KEY = "pressure_today";
-
     private static final String[] NOTIFY_WEATHER_PROJECTION = new String[] {
             WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
             WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
@@ -364,8 +356,11 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
                 JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
                 high = temperatureObject.getDouble(OWM_MAX);
                 low = temperatureObject.getDouble(OWM_MIN);
-                updateWearData(new WearDataObject(weatherId, description, (float)high,(float)low, (float)pressure,
-                        (float)humidity));
+
+                if(i == 0) {//only fetch today's weather of wear, as we will only display that on wear
+                    updateWearData(new WearDataObject(weatherId, description, (float) high, (float) low, (float) pressure,
+                            humidity));
+                }
                 ContentValues weatherValues = new ContentValues();
 
                 weatherValues.put(WeatherContract.WeatherEntry.COLUMN_LOC_KEY, locationId);
@@ -409,18 +404,30 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
     }
 
     private void updateWearData(WearDataObject wearDataObject) {
-        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(TODAY_WEATHER_PATH);
+        PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(getContext().getString(R.string.today_weather_path));
         DataMap dataMap = putDataMapRequest.getDataMap();
         int weatherArtResourceId = Utility.getArtResourceForWeatherCondition(wearDataObject.getWeatherId());
         Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), weatherArtResourceId);
         Asset asset = Utility.createAssetFromBitmap(bitmap);
-        dataMap.putAsset(WEATHER_ASSET_TODAY_KEY, asset);
-        dataMap.putString(WETHER_DESC_TODAY_KEY, wearDataObject.getDescription());
-        dataMap.putString(MAX_TEMP_TODAY_KEY, Utility.formatTemperature(getContext(),wearDataObject.getMaxTemp()));
-        dataMap.putString(MIN_TEMP_TODAY_KEY, Utility.formatTemperature(getContext(),wearDataObject.getMinTemp()));
-        dataMap.putFloat(HUMIDITY_TODAY_KEY, wearDataObject.getHumidity());
-        dataMap.putFloat(PRESSURE_TODAY_KEY, wearDataObject.getPressure());
+        /*
+    private static final String WEATHER_ASSET_TODAY_KEY = "weather_asset_today";
+    private static final String WETHER_DESC_TODAY_KEY = "weather_desc_today";
+    private static final String MAX_TEMP_TODAY_KEY = "max_temp_today";
+    private static final String MIN_TEMP_TODAY_KEY = "min_temp_today";
+    private static final String HUMIDITY_TODAY_KEY = "humidity_today";
+    private static final String PRESSURE_TODAY_KEY = "pressure_today";*/
+        dataMap.putAsset(getContext().getString(R.string.weather_asset_today_key), asset);
+        dataMap.putString(getContext().getString(R.string.weather_desc_today_key), wearDataObject.getDescription());
+        dataMap.putString(getContext().getString(R.string.max_temp_today_key),
+                Utility.formatTemperature(getContext(),wearDataObject.getMaxTemp()));
+        dataMap.putString(getContext().getString(R.string.min_temp_today_key),
+                Utility.formatTemperature(getContext(),wearDataObject.getMinTemp()));
+        String humidity = getContext().getString(R.string.format_humidity, wearDataObject.getHumidity());
+        String pressure = getContext().getString(R.string.format_pressure, wearDataObject.getPressure());
+        dataMap.putString(getContext().getString(R.string.humidity_today_key), humidity);
+        dataMap.putString(getContext().getString(R.string.pressure_today_key), pressure);
         dataMap.putLong("Time", System.currentTimeMillis());
+        Log.d(LOG_TAG, "HUMIDITY: "+humidity+" PRESSURE: "+pressure);
         putDataRequest = putDataMapRequest.asPutDataRequest();
         if(mGoogleApiClient.isConnected()) {
             Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest);

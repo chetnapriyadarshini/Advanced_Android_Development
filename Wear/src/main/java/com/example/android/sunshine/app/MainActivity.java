@@ -51,10 +51,16 @@ public class MainActivity extends Activity {
 
             WearDataObject wearDataObject = (WearDataObject) intent.getSerializableExtra
                     (context.getString(R.string.weather_object_key));
-            mTextView.setText("MaxTemp: "+wearDataObject.getMaxTemp()+"\n"+
-                    "MinTemp: "+wearDataObject.getMinTemp()+"\n"+
-                    "Humidity: "+wearDataObject.getHumidity()+"\n"+
-                    "Pressure: "+wearDataObject.getPressure());
+            if(wearDataObject.getHumidity() == null){
+                //  Only temprature has been updated we keep other fields as it is
+                mTextView.setText("MaxTemp: "+wearDataObject.getMaxTemp()+"\n"+
+                        "MinTemp: "+wearDataObject.getMinTemp());
+            }else {
+                mTextView.setText("MaxTemp: " + wearDataObject.getMaxTemp() + "\n" +
+                        "MinTemp: " + wearDataObject.getMinTemp() + "\n" +
+                        "Humidity: " + wearDataObject.getHumidity() + "\n" +
+                        "Pressure: " + wearDataObject.getPressure());
+            }
 
         }
     }

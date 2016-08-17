@@ -235,5 +235,12 @@
     <string name="gcm_defaultSenderId" translatable="false"></string>
     <!-- For Google Places API Attributions -->
     <string name="attribution_text">Powered by Google</string>
+    <string name="today_weather_path" translatable="false">/today_weather</string>
+    <string name="weather_asset_today_key" translatable="false">weather_asset_today</string>
+    <string name="weather_desc_today_key" translatable="false">weather_desc_today</string>
+    <string name="max_temp_today_key" translatable="false">max_temp_today</string>
+    <string name="min_temp_today_key" translatable="false">min_temp_today</string>
+    <string name="humidity_today_key" translatable="false">humidity_today</string>
+    <string name="pressure_today_key" translatable="false">pressure_today</string>
 
 </resources>

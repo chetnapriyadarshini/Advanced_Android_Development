@@ -18,12 +18,15 @@ package com.example.android.sunshine.app;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,9 +34,15 @@ import android.view.View;
 import android.widget.ImageView;
 import com.example.android.sunshine.app.data.WeatherContract;
 import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
+import com.example.android.sunshine.app.sync.WearDataObject;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings.
@@ -44,9 +53,10 @@ import com.google.android.gms.maps.model.LatLng;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends PreferenceActivity
-        implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
+        implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener, GoogleApiClient.ConnectionCallbacks {
     protected final static int PLACE_PICKER_REQUEST = 9090;
     private ImageView mAttribution;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -171,6 +181,7 @@ public class SettingsActivity extends PreferenceActivity
         } else if ( key.equals(getString(R.string.pref_units_key)) ) {
             // units have changed. update lists of weather entries accordingly
             getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
+            updateUnitInPairedWearDevice();
         } else if ( key.equals(getString(R.string.pref_location_status_key)) ) {
             // our location status has changed.  Update the summary accordingly
             Preference locationPreference = findPreference(getString(R.string.pref_location_key));
@@ -179,6 +190,13 @@ public class SettingsActivity extends PreferenceActivity
             // art pack have changed. update lists of weather entries accordingly
             getContentResolver().notifyChange(WeatherContract.WeatherEntry.CONTENT_URI, null);
         }
+    }
+
+    private void updateUnitInPairedWearDevice() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .build();
+        mGoogleApiClient.connect();
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -240,5 +258,39 @@ public class SettingsActivity extends PreferenceActivity
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        String locationQuery = Utility.getPreferredLocation(this);
+        Uri weatherUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(locationQuery, System.currentTimeMillis());
+        Cursor cursor = getContentResolver().query(weatherUri, new String[]{WeatherContract.WeatherEntry.COLUMN_MAX_TEMP,
+                WeatherContract.WeatherEntry.COLUMN_MIN_TEMP}, null, null, null);
+        if(cursor.moveToFirst()){
+
+            int INDEX_MAX_TEMP = 0;
+            int INDEX_MIN_TEMP = 1;
+            double high = cursor.getDouble(INDEX_MAX_TEMP);
+            double low = cursor.getDouble(INDEX_MIN_TEMP);
+            /*
+            We only need to update the temprature in the case when units are changed, so we only send the minimum required data
+            to wear and conserve battry
+             */
+            PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(getString(R.string.today_weather_path));
+            DataMap dataMap = putDataMapRequest.getDataMap();
+            dataMap.putString(getString(R.string.max_temp_today_key), Utility.formatTemperature(this,high));
+            dataMap.putString(getString(R.string.min_temp_today_key), Utility.formatTemperature(this, low));
+            dataMap.putLong("Time", System.currentTimeMillis());
+            PutDataRequest putDataRequest = putDataMapRequest.asPutDataRequest();
+            Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest);
+            Wearable.DataApi.putDataItem(mGoogleApiClient, putDataRequest);
+            mGoogleApiClient.disconnect();
+        }
+        cursor.close();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
     }
 }

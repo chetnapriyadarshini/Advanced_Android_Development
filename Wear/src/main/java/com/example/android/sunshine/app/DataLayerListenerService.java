@@ -62,10 +62,14 @@ public class DataLayerListenerService extends WearableListenerService {
                     String maxTemp = dataMapItem.getDataMap().getString(MAX_TEMP_TODAY_KEY);
                     String minTemp = dataMapItem.getDataMap().getString(MIN_TEMP_TODAY_KEY);
                     String weatherDesc =  dataMapItem.getDataMap().getString(WETHER_DESC_TODAY_KEY);
-                    float humidity = dataMapItem.getDataMap().getFloat(HUMIDITY_TODAY_KEY);
-                    float pressure = dataMapItem.getDataMap().getFloat(PRESSURE_TODAY_KEY);
-                    wearDataObject= new WearDataObject(weatherDesc, maxTemp, minTemp,
+                    String humidity = dataMapItem.getDataMap().getString(HUMIDITY_TODAY_KEY);
+                    String pressure = dataMapItem.getDataMap().getString(PRESSURE_TODAY_KEY);
+                    if(humidity != null && pressure != null && weatherDesc != null
+                            && maxTemp != null && minTemp != null)
+                        wearDataObject= new WearDataObject(weatherDesc, maxTemp, minTemp,
                             pressure, humidity);
+                    else if(maxTemp != null && minTemp != null)
+                        wearDataObject= new WearDataObject(maxTemp, minTemp);
                     Log.d(TAG, "MAX TEMP: "+maxTemp);
                     Log.d(TAG, "MIN TEMP: "+minTemp);
                     Log.d(TAG, "DESCRIPTION: "+weatherDesc);
@@ -74,7 +78,10 @@ public class DataLayerListenerService extends WearableListenerService {
                     mTextView.setText(mTextView.getText()+"\n"+"Max Temp: "+maxTemp
                             +"\nMin Temp: "+minTemp+"\nHumidity: "+humidity+"\nPressure: "+pressure);*/
                     // Loads image on background thread.
-                    new LoadBitmapAsyncTask().execute(photoAsset);
+                    if(photoAsset != null)
+                        new LoadBitmapAsyncTask().execute(photoAsset);
+                    else
+                        broadcastUpdatedWeather(null);
 
                 }
         }
@@ -106,16 +113,22 @@ public class DataLayerListenerService extends WearableListenerService {
         @Override
         protected void onPostExecute(Bitmap bitmap) {
 
-            if (bitmap != null) {
+           /* if (bitmap != null)*/ {
                 Log.d(TAG, "Setting background image on second page..");
-                Intent intent = new Intent();
-                intent.putExtra(getResources().getString(R.string.bitmap_resource_key), bitmap);
-                intent.putExtra(getResources().getString(R.string.weather_object_key), wearDataObject);
-                intent.setAction(getResources().getString(R.string.broadcast_weather));
-                mGoogleApiClient.disconnect();
-                Log.d(TAG, "BROADCAST THE DATA CHANGESSSSSSSSSSSSS");
-                sendBroadcast(intent);
+                broadcastUpdatedWeather(bitmap);
             }
         }
+    }
+
+    private void broadcastUpdatedWeather(Bitmap bitmap) {
+        Intent intent = new Intent();
+        if(bitmap != null)
+            intent.putExtra(getResources().getString(R.string.bitmap_resource_key), bitmap);
+        intent.putExtra(getResources().getString(R.string.weather_object_key), wearDataObject);
+        intent.setAction(getResources().getString(R.string.broadcast_weather));
+        mGoogleApiClient.disconnect();
+        wearDataObject = null;
+        Log.d(TAG, "BROADCAST THE DATA CHANGESSSSSSSSSSSSS");
+        sendBroadcast(intent);
     }
 }
