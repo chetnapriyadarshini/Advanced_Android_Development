@@ -60,6 +60,11 @@
                 <action android:name="broadcast_weather"/>
             </intent-filter>
         </receiver>
+        <receiver android:name=".SunshineWatchFace$DataReceiver">
+            <intent-filter>
+                <action android:name="broadcast_weather"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

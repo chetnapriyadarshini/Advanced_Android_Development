@@ -59,7 +59,7 @@ import java.util.concurrent.TimeUnit;
  * Digital watch face with seconds. In ambient mode, the seconds aren't displayed. On devices with
  * low-bit ambient mode, the text is drawn without anti-aliasing in ambient mode.
  */
-public class SunshineWatchFace extends CanvasWatchFaceService implements DataApi.DataListener{
+public class SunshineWatchFace extends CanvasWatchFaceService{
     private static final Typeface NORMAL_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
@@ -82,12 +82,6 @@ public class SunshineWatchFace extends CanvasWatchFaceService implements DataApi
         return new Engine();
     }
 
-
-    @Override
-    public void onDataChanged(DataEventBuffer dataEvents) {
-        Log.d(TAG, "onDataChanged(): " + dataEvents);
-
-    }
 
     private static class EngineHandler extends Handler {
         private final WeakReference<SunshineWatchFace.Engine> mWeakReference;
@@ -320,6 +314,14 @@ public class SunshineWatchFace extends CanvasWatchFaceService implements DataApi
                         - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
                 mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
             }
+        }
+    }
+
+    public static class DataReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
         }
     }
 }
