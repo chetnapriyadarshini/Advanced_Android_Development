@@ -32,14 +32,11 @@ import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.graphics.Palette;
 import android.support.wearable.watchface.CanvasWatchFaceService;
 import android.support.wearable.watchface.WatchFaceService;
 import android.support.wearable.watchface.WatchFaceStyle;
 import android.util.Log;
 import android.view.SurfaceHolder;
-
-import java.lang.ref.WeakReference;
 import java.util.Calendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
@@ -51,7 +48,7 @@ import java.util.concurrent.TimeUnit;
 public class SunshineAnalogWatchFace extends CanvasWatchFaceService{
     private static final String TAG = SunshineAnalogWatchFace.class.getSimpleName();
     private static Bitmap mBackgroundBitmap;
-    private static String mWeatherDesc;
+
 
 /*
     private static Bitmap mBackgroundBitmap;
@@ -520,14 +517,10 @@ public class SunshineAnalogWatchFace extends CanvasWatchFaceService{
     }
 
     public static class DataReceiver extends BroadcastReceiver {
-
         @Override
         public void onReceive(Context context, Intent intent) {
-            mBackgroundBitmap = intent.getParcelableExtra(context.getString(R.string.bitmap_resource_key));
-            WearDataObject wearDataObject = (WearDataObject) intent.getSerializableExtra
-                    (context.getString(R.string.weather_object_key));
-            mWeatherDesc = wearDataObject.getDescription();
-
+            if(intent.hasExtra(context.getString(R.string.bitmap_resource_key)))
+                mBackgroundBitmap = intent.getParcelableExtra(context.getString(R.string.bitmap_resource_key));
         }
     }
 

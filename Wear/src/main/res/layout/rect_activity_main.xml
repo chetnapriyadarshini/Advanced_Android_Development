@@ -18,7 +18,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="50"
                 android:gravity="center"
-                android:layout_height="match_parent">
+                tools:layout_height="match_parent">
 
 
                 <ImageView
@@ -26,7 +26,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:src="@drawable/common_google_signin_btn_icon_dark_normal"/>
+                    tools:src="@drawable/common_google_signin_btn_icon_dark_normal"/>
 
             </LinearLayout>
 
@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textColor="@color/primary_text"
-                    android:text="20" />
+                    tools:text="20" />
 
 
                 <TextView
@@ -52,7 +52,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textColor="@color/secondary_text"
-                    android:text="11" />
+                    tools:text="11" />
 
             </LinearLayout>
         </LinearLayout>
@@ -65,7 +65,7 @@
             android:paddingBottom="@dimen/diag_button_bottom_padding"
             android:textColor="@color/secondary_text"
             android:textAppearance="@style/TextAppearance.Wearable.Medium"
-            android:text="Sunny" />
+            tools:text="Sunny" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -87,7 +87,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.Wearable.Small"
                 android:textColor="@color/detail_accent_label"
-                android:text="Pressure:" />
+                android:text="@string/pressure_label" />
 
 
             <TextView
@@ -96,7 +96,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.Wearable.Small"
                 android:textColor="@color/detail_accent_label"
-                android:text="Humidity:" />
+                android:text="@string/humidity_label" />
         </LinearLayout>
 
 
@@ -112,7 +112,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.Wearable.Small"
-                android:text="275hpa" />
+                tools:text="275hpa" />
 
 
             <TextView
@@ -120,7 +120,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAppearance="@style/TextAppearance.Wearable.Small"
-                android:text="11%" />
+                tools:text="11%" />
         </LinearLayout>
 
     </LinearLayout>

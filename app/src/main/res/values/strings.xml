@@ -242,5 +242,6 @@
     <string name="min_temp_today_key" translatable="false">min_temp_today</string>
     <string name="humidity_today_key" translatable="false">humidity_today</string>
     <string name="pressure_today_key" translatable="false">pressure_today</string>
+    <string name="friendly_day_string" translatable="false">day_string</string>
 
 </resources>

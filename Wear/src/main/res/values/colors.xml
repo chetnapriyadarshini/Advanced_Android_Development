@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="background">#000000</color>
+    <color name="background">#03A9F4</color>
     <color name="background2">#000088</color>
     <color name="digital_text">#ffffff</color>
     <color name="detail_accent_pane_background">#455A64</color>
@@ -8,4 +8,5 @@
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
     <color name="analog_hands">#cccccc</color>
+    <color name="eggwhite">#FFF5C3</color>
 </resources>

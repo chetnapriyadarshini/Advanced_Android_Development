@@ -409,13 +409,6 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
         int weatherArtResourceId = Utility.getArtResourceForWeatherCondition(wearDataObject.getWeatherId());
         Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), weatherArtResourceId);
         Asset asset = Utility.createAssetFromBitmap(bitmap);
-        /*
-    private static final String WEATHER_ASSET_TODAY_KEY = "weather_asset_today";
-    private static final String WETHER_DESC_TODAY_KEY = "weather_desc_today";
-    private static final String MAX_TEMP_TODAY_KEY = "max_temp_today";
-    private static final String MIN_TEMP_TODAY_KEY = "min_temp_today";
-    private static final String HUMIDITY_TODAY_KEY = "humidity_today";
-    private static final String PRESSURE_TODAY_KEY = "pressure_today";*/
         dataMap.putAsset(getContext().getString(R.string.weather_asset_today_key), asset);
         dataMap.putString(getContext().getString(R.string.weather_desc_today_key), wearDataObject.getDescription());
         dataMap.putString(getContext().getString(R.string.max_temp_today_key),
@@ -426,6 +419,8 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter implements 
         String pressure = getContext().getString(R.string.format_pressure, wearDataObject.getPressure());
         dataMap.putString(getContext().getString(R.string.humidity_today_key), humidity);
         dataMap.putString(getContext().getString(R.string.pressure_today_key), pressure);
+        dataMap.putString(getContext().getString(R.string.friendly_day_string),
+                Utility.getFormattedMonthDay(getContext(), System.currentTimeMillis()));
         dataMap.putLong("Time", System.currentTimeMillis());
         Log.d(LOG_TAG, "HUMIDITY: "+humidity+" PRESSURE: "+pressure);
         putDataRequest = putDataMapRequest.asPutDataRequest();

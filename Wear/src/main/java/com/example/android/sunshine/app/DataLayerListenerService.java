@@ -33,6 +33,7 @@ public class DataLayerListenerService extends WearableListenerService {
     private static final String HUMIDITY_TODAY_KEY = "humidity_today";
     private static final String PRESSURE_TODAY_KEY = "pressure_today";
     private static final String TAG = DataLayerListenerService.class.getSimpleName();
+    private static final String FRIENDLY_DAY_STRING = "day_string";
     private GoogleApiClient mGoogleApiClient;
     private WearDataObject wearDataObject;
 
@@ -58,7 +59,7 @@ public class DataLayerListenerService extends WearableListenerService {
                     DataMapItem dataMapItem = DataMapItem.fromDataItem(event.getDataItem());
                     Asset photoAsset = dataMapItem.getDataMap()
                             .getAsset(WEATHER_ASSET_TODAY_KEY);
-
+                    String dayString = dataMapItem.getDataMap().getString(FRIENDLY_DAY_STRING);
                     String maxTemp = dataMapItem.getDataMap().getString(MAX_TEMP_TODAY_KEY);
                     String minTemp = dataMapItem.getDataMap().getString(MIN_TEMP_TODAY_KEY);
                     String weatherDesc =  dataMapItem.getDataMap().getString(WETHER_DESC_TODAY_KEY);
@@ -66,7 +67,7 @@ public class DataLayerListenerService extends WearableListenerService {
                     String pressure = dataMapItem.getDataMap().getString(PRESSURE_TODAY_KEY);
                     if(humidity != null && pressure != null && weatherDesc != null
                             && maxTemp != null && minTemp != null)
-                        wearDataObject= new WearDataObject(weatherDesc, maxTemp, minTemp,
+                        wearDataObject= new WearDataObject(dayString,weatherDesc, maxTemp, minTemp,
                             pressure, humidity);
                     else if(maxTemp != null && minTemp != null)
                         wearDataObject= new WearDataObject(maxTemp, minTemp);

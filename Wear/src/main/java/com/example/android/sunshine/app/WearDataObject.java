@@ -14,14 +14,16 @@ public class WearDataObject implements Serializable
     private String pressure;
     private String humidity;
     private String description;
+    private String dayString;
 
-    public WearDataObject(String description, String maxTemp, String minTemp, String pressure, String humidity){
+    public WearDataObject(String dayString, String description, String maxTemp, String minTemp, String pressure, String humidity){
 
         this.description = description;
         this.maxTemp = maxTemp;
         this.minTemp = minTemp;
         this.pressure = pressure;
         this.humidity = humidity;
+        this.dayString = dayString;
     }
 
     public WearDataObject(String maxTemp, String minTemp) {
@@ -29,6 +31,9 @@ public class WearDataObject implements Serializable
         this.minTemp = minTemp;
     }
 
+    public String getDayString() {
+        return dayString;
+    }
 
     public String getDescription() {
         return description;
