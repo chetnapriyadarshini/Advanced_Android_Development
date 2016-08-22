@@ -43,6 +43,11 @@
                 <action android:name="broadcast_weather" />
             </intent-filter>
         </receiver>
+        <receiver android:name=".SunshineAnalogWatchFace$DataReceiver">
+            <intent-filter>
+                <action android:name="broadcast_weather" />
+            </intent-filter>
+        </receiver>
 
         <service
             android:name=".SunshineAnalogWatchFace"

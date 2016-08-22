@@ -69,6 +69,9 @@ public class MainActivity extends Activity {
                         "Pressure: " + wearDataObject.getPressure());*/
                 mHighTempView.setText(wearDataObject.getMaxTemp());
                 mLowTempView.setText(wearDataObject.getMinTemp());
+            }else{
+                mHighTempView.setText(wearDataObject.getMaxTemp());
+                mLowTempView.setText(wearDataObject.getMinTemp());
                 mPressureView.setText(wearDataObject.getPressure());
                 mHumidityView.setText(wearDataObject.getHumidity());
                 mDescView.setText(wearDataObject.getDescription());
