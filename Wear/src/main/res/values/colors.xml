@@ -7,4 +7,5 @@
     <color name="detail_accent_label">#90A4AE</color>
     <color name="primary_text">#212121</color>
     <color name="secondary_text">#727272</color>
+    <color name="analog_hands">#cccccc</color>
 </resources>

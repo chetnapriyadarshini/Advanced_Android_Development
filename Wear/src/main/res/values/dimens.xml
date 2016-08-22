@@ -10,4 +10,5 @@
     <dimen name="round_watch_desc_padding">25dp</dimen>
     <dimen name="round_watch_bottom_items_padding">10dp</dimen>
     <dimen name="round_watch_weather_res_padding">15dp</dimen>
+    <dimen name="analog_hand_stroke">3dp</dimen>
 </resources>
