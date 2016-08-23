@@ -150,6 +150,7 @@ public class SunshineDigitalWatchFace extends CanvasWatchFaceService {
             mDayStrPaint = new Paint();
             mDayStrPaint = createTextPaint(resources.getColor(R.color.digital_text));
 
+
             mTime = new Time();
         }
 
@@ -210,6 +211,7 @@ public class SunshineDigitalWatchFace extends CanvasWatchFaceService {
             // Load resources that have alternate values for round watches.
             Resources resources = SunshineDigitalWatchFace.this.getResources();
             boolean isRound = insets.isRound();
+            mYOffset = resources.getDimension(isRound? R.dimen.digital_y_offset_round:R.dimen.digital_y_offset);
             mXOffset = resources.getDimension(isRound
                     ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
             float textSize = resources.getDimension(isRound
@@ -296,10 +298,11 @@ public class SunshineDigitalWatchFace extends CanvasWatchFaceService {
 
             if(mWeatherBitmap == null)
                 return;
-            float scale = ((float) mWeatherBitmap.getWidth()/(width*2f));
+
+        //    float scale = ((float) mWeatherBitmap.getWidth()/(width*factor));
             mWeatherBitmap = Bitmap.createScaledBitmap(mWeatherBitmap,
-                    (int)(mWeatherBitmap.getWidth()*scale),
-                    (int)(mWeatherBitmap.getHeight()*scale), true);
+                    50,
+                    50, true);
             /*
              * Create a gray version of the image only if it will look nice on the device in
              * ambient mode. That means we don't want devices that support burn-in
@@ -344,19 +347,19 @@ public class SunshineDigitalWatchFace extends CanvasWatchFaceService {
             mTime.setToNow();
             String text = String.format("%d:%02d", mTime.hour, mTime.minute);
             float currentY = mYOffset;
-            mXOffset = mCenterX - mTextPaint.getTextSize();
+            mXOffset = mCenterX - mTextPaint.getTextSize()-spacing;
             canvas.drawText(text, mXOffset, currentY, mTextPaint);
             if(mWeatherBitmap != null) {
-
                 currentY = currentY + mDayStrPaint.getTextSize()+spacing;
-                canvas.drawText(mDayString, mCenterX-mDayStrPaint.getTextSize()-spacing, currentY, mDayStrPaint);
+                canvas.drawText(mDayString, /*mCenterX-mDayStrPaint.getTextSize()-spacing*/
+                        mXOffset+mDayStrPaint.getTextSize()/2, currentY, mDayStrPaint);
                 currentY = currentY + spacing+mDayStrPaint.getTextSize();
                 canvas.drawBitmap(mWeatherBitmap, mXOffset-mWeatherBitmap.getWidth()/2, currentY,mBackgroundPaint);
                 float xOffset = mXOffset+spacing;
-                canvas.drawLine(mCenterX-25, mCenterY, mCenterX+25, mCenterY,mTextPaint);
+                canvas.drawLine(mCenterX-25, mCenterY+spacing, mCenterX+25, mCenterY+spacing,mTextPaint);
                 currentY = currentY+mWeatherBitmap.getHeight()/2+mMaxTempPaint.getTextSize()/2;
-                canvas.drawText(mMaxTemp,mWeatherBitmap.getWidth() + xOffset - mMaxTempPaint.getTextSize(),currentY, mMaxTempPaint);
-                xOffset = xOffset+mMaxTempPaint.getTextSize();
+                canvas.drawText(mMaxTemp,mWeatherBitmap.getWidth() + xOffset ,currentY, mMaxTempPaint);
+                xOffset = xOffset+mMaxTempPaint.getTextSize()+spacing;
                 canvas.drawText(mMinTemp, mWeatherBitmap.getWidth() + xOffset,currentY, mMinTempPaint);
             }
 

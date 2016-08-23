@@ -11,6 +11,7 @@
     <dimen name="digital_x_offset">25dp</dimen>
     <dimen name="digital_x_offset_round">35dp</dimen>
     <dimen name="digital_y_offset">50dp</dimen>
+    <dimen name="digital_y_offset_round">70dp</dimen>
     <dimen name="round_watch_temp_padding">10dp</dimen>
     <dimen name="round_watch_padding_left_temp_items">15dp</dimen>
     <dimen name="round_watch_desc_padding">25dp</dimen>
